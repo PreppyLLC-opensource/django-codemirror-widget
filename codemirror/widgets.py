@@ -20,6 +20,8 @@ if CODEMIRROR_PATH.endswith('/'):
 CODEMIRROR_MODE = getattr(settings, 'CODEMIRROR_MODE', 'javascript')
 CODEMIRROR_THEME = getattr(settings, 'CODEMIRROR_THEME', 'default')
 CODEMIRROR_CONFIG = getattr(settings, 'CODEMIRROR_CONFIG', { 'lineNumbers': True })
+CODEMIRROR_ADDON_JS = getattr(settings, 'CODEMIRROR_ADDON_JS', '')
+CODEMIRROR_ADDON_CSS = getattr(settings, 'CODEMIRROR_ADDON_CSS', '')
 CODEMIRROR_JS_VAR_FORMAT = getattr(settings, 'CODEMIRROR_JS_VAR_FORMAT', None)
 
 THEME_CSS_FILENAME_RE = re.compile(r'[\w-]+')
@@ -139,8 +141,8 @@ class CodeMirrorTextarea(forms.Textarea):
         self.mode_name = mode['name']
         self.custom_mode = custom_mode
         self.dependencies = dependencies
-        self.addon_js = addon_js
-        self.addon_css = addon_css
+        self.addon_js = addon_js or CODEMIRROR_ADDON_JS
+        self.addon_css = addon_css or CODEMIRROR_ADDON_CSS
         self.custom_js = custom_js
         self.custom_css = custom_css
         self.keymap = keymap
@@ -166,6 +168,12 @@ class CodeMirrorTextarea(forms.Textarea):
         else:
             js_var_bit = ''
         output = [super(CodeMirrorTextarea, self).render(name, value, attrs),
-            '<script type="text/javascript">%sCodeMirror.fromTextArea(document.getElementById(%s), %s);</script>' %
-                (js_var_bit, '"id_%s"' % name, self.option_json)]
+
+            '<script type="text/javascript">\n'
+            'var textArea = document.getElementById(%s);\n'
+            'if (textArea != null) {\n'
+            '%sCodeMirror.fromTextArea(textArea, %s);\n'
+            '}\n'
+            '</script>' %
+                  ('"id_%s"' % name, js_var_bit, self.option_json)]
         return mark_safe('\n'.join(output))
