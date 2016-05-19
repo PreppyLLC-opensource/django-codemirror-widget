@@ -18,6 +18,7 @@ CODEMIRROR_PATH = getattr(settings, 'CODEMIRROR_PATH', 'codemirror')
 if CODEMIRROR_PATH.endswith('/'):
     CODEMIRROR_PATH = CODEMIRROR_PATH[:-1]
 CODEMIRROR_MODE = getattr(settings, 'CODEMIRROR_MODE', 'javascript')
+CODEMIRROR_DEPENDENCIES = getattr(settings, 'CODEMIRROR_DEPENDENCIES', '')
 CODEMIRROR_THEME = getattr(settings, 'CODEMIRROR_THEME', 'default')
 CODEMIRROR_CONFIG = getattr(settings, 'CODEMIRROR_CONFIG', { 'lineNumbers': True })
 CODEMIRROR_ADDON_JS = getattr(settings, 'CODEMIRROR_ADDON_JS', '')
@@ -140,7 +141,7 @@ class CodeMirrorTextarea(forms.Textarea):
             mode = { 'name': mode }
         self.mode_name = mode['name']
         self.custom_mode = custom_mode
-        self.dependencies = dependencies
+        self.dependencies = dependencies or CODEMIRROR_DEPENDENCIES
         self.addon_js = addon_js or CODEMIRROR_ADDON_JS
         self.addon_css = addon_css or CODEMIRROR_ADDON_CSS
         self.custom_js = custom_js
